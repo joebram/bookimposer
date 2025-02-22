@@ -2,6 +2,7 @@ import streamlit as st
 from PyPDF2 import PdfReader, PdfWriter
 import math
 import tempfile
+import os
 try:
     from reportlab.lib.pagesizes import A3, A4
 except ImportError:
@@ -43,11 +44,29 @@ def impose_booklet(input_pdf, num_signatures):
             else:
                 imposed_writer.add_blank_page(width=width, height=height)  # Specify blank page size
 
-    temp_output = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    with open(temp_output.name, "wb") as f:
+    temp_output = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf").name
+    with open(temp_output, "wb") as f:
         imposed_writer.write(f)
 
-    return temp_output.name
+    return temp_output
+
+def preview_pdf(input_pdf):
+    poppler_path = "/opt/homebrew/bin"  # Apple Silicon (M1/M2/M3)
+    # poppler_path = "/usr/local/bin"  # Uncomment this for Intel Macs
+    
+    # Save uploaded file to a temporary file
+    temp_pdf_path = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf").name
+    with open(temp_pdf_path, "wb") as f:
+        f.write(input_pdf.getvalue())  # Save the uploaded file content
+
+    # Convert PDF pages to images
+    images = convert_from_path(temp_pdf_path, first_page=1, last_page=5, poppler_path=poppler_path)
+    
+    # Remove the temp file after conversion
+    os.remove(temp_pdf_path)
+
+    preview_images = [Image.fromarray(img) for img in images]
+    return preview_images
 
 def preview_imposed_order(input_pdf, num_signatures):
     reader = PdfReader(input_pdf)
@@ -82,14 +101,6 @@ def preview_imposed_order(input_pdf, num_signatures):
         imposed_images.append(img)
     
     return imposed_images
-
-def preview_pdf(input_pdf):
-    poppler_path = "/opt/homebrew/bin"  # Apple Silicon (M1/M2/M3)
-    # poppler_path = "/usr/local/bin"  # Uncomment this for Intel Macs
-    
-    images = convert_from_path(input_pdf, first_page=1, last_page=5, poppler_path=poppler_path)
-    preview_images = [Image.fromarray(img) for img in images]
-    return preview_images
 
 st.title("PDF Booklet Imposition Tool")
 
