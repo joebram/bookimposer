@@ -55,7 +55,7 @@ def preview_pdf(input_pdf):
     poppler_path = os.popen("which pdfinfo").read().strip()
 
     if not poppler_path:
-        st.error("Poppler is not installed or not in PATH. Please install it with 'brew install poppler'.")
+        st.warning("Poppler was not detected, but the preview may still work if Poppler is available.")
         return []
 
     # Save uploaded file to a temporary file
