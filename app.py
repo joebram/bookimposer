@@ -84,7 +84,10 @@ def preview_imposed_order(input_pdf, num_signatures):
     return imposed_images
 
 def preview_pdf(input_pdf):
-    images = convert_from_path(input_pdf, first_page=1, last_page=5)  # Convert first few pages to images
+    poppler_path = "/opt/homebrew/bin"  # Apple Silicon (M1/M2/M3)
+    # poppler_path = "/usr/local/bin"  # Uncomment this for Intel Macs
+    
+    images = convert_from_path(input_pdf, first_page=1, last_page=5, poppler_path=poppler_path)
     preview_images = [Image.fromarray(img) for img in images]
     return preview_images
 
