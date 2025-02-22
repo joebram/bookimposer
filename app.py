@@ -115,12 +115,12 @@ if uploaded_file:
     st.subheader("Preview of Uploaded PDF")
     preview_images = preview_pdf(uploaded_file)
     for img in preview_images:
-        st.image(img, caption="Preview Page", use_column_width=True)
+        st.image(img, caption="Preview Page", use_container_width=True)
     
     if st.button("Preview Imposed Layout"):
         imposed_images = preview_imposed_order(uploaded_file, num_signatures)
         for img in imposed_images:
-            st.image(img, caption="Imposed Layout Preview", use_column_width=True)
+            st.image(img, caption="Imposed Layout Preview", use_container_width=True)
     
     if st.button("Generate Booklet PDF"):
         imposed_pdf_path = impose_booklet(uploaded_file, num_signatures)
