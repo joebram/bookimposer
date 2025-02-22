@@ -2,7 +2,10 @@ import streamlit as st
 from PyPDF2 import PdfReader, PdfWriter
 import math
 import tempfile
-from reportlab.lib.pagesizes import A3
+try:
+    from reportlab.lib.pagesizes import A3, A4
+except ImportError:
+    st.error("ReportLab is not installed. Please install it using 'pip install reportlab'.")
 from pdf2image import convert_from_path
 from PIL import Image, ImageDraw
 
