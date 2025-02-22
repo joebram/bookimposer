@@ -51,16 +51,20 @@ def impose_booklet(input_pdf, num_signatures):
     return temp_output
 
 def preview_pdf(input_pdf):
-    poppler_path = "/opt/homebrew/bin"  # Apple Silicon (M1/M2/M3)
-    # poppler_path = "/usr/local/bin"  # Uncomment this for Intel Macs
-    
+    # Dynamically locate poppler
+    poppler_path = os.popen("which pdfinfo").read().strip()
+
+    if not poppler_path:
+        st.error("Poppler is not installed or not in PATH. Please install it with 'brew install poppler'.")
+        return []
+
     # Save uploaded file to a temporary file
     temp_pdf_path = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf").name
     with open(temp_pdf_path, "wb") as f:
         f.write(input_pdf.getvalue())  # Save the uploaded file content
 
     # Convert PDF pages to images
-    images = convert_from_path(temp_pdf_path, first_page=1, last_page=5, poppler_path=poppler_path)
+    images = convert_from_path(temp_pdf_path, first_page=1, last_page=5, poppler_path=os.path.dirname(poppler_path))
     
     # Remove the temp file after conversion
     os.remove(temp_pdf_path)
