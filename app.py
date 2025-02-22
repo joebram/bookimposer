@@ -54,17 +54,18 @@ def preview_pdf(input_pdf):
     # Dynamically locate poppler
     poppler_path = os.popen("which pdfinfo").read().strip()
 
-    if not poppler_path:
-        st.warning("Poppler was not detected, but the preview may still work if Poppler is available.")
-        return []
-
     # Save uploaded file to a temporary file
     temp_pdf_path = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf").name
     with open(temp_pdf_path, "wb") as f:
         f.write(input_pdf.getvalue())  # Save the uploaded file content
 
-    # Convert PDF pages to images
-    images = convert_from_path(temp_pdf_path, first_page=1, last_page=5, poppler_path=os.path.dirname(poppler_path))
+    try:
+        # Convert PDF pages to images
+        images = convert_from_path(temp_pdf_path, first_page=1, last_page=5, poppler_path=os.path.dirname(poppler_path) if poppler_path else None)
+    except Exception as e:
+        st.warning("Poppler was not detected or PDF conversion failed. Ensure Poppler is installed with 'brew install poppler'.")
+        os.remove(temp_pdf_path)
+        return []
     
     # Remove the temp file after conversion
     os.remove(temp_pdf_path)
